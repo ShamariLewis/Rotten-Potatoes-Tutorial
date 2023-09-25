@@ -1,4 +1,5 @@
 const express = require("express");
+const methodOverride = require("method-override");
 const app = express();
 let { engine } = require("express-handlebars");
 const exphbs = engine;
@@ -8,6 +9,7 @@ const bodyParser = require("body-parser");
 // This line must appear after the app = express() declaration.
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(methodOverride("_method"));
 
 mongoose.connect("mongodb+srv://superskl5000:BE5IorpNY0Z6ApoV@100devs.c7wjvtf.mongodb.net/rotten-potatoes?retryWrites=true&w=majority", { useNewUrlParser: true});
 
@@ -38,7 +40,7 @@ app.get("/", async(req, res) => {
 
 app.get("/reviews/new", async(req, res) => {
     try {
-        res.render("reviews-new", {});
+        res.render("reviews-new", {title: "New Review"});
     } catch (error) {
         console.log(error)
     }
@@ -46,7 +48,7 @@ app.get("/reviews/new", async(req, res) => {
 
 app.post("/reviews", async(req, res) => {
     try {
-        const review = Review.create(req.body);
+        const review = await Review.create(req.body);
         console.log(review);
         res.redirect(`/reviews/${review._id}`);
     } catch (error) {
@@ -58,6 +60,23 @@ app.get("/reviews/:id", async(req, res) => {
     try {
         const review = await Review.findById(req.params.id)
         res.render("reviews-show", { review: review });
+    } catch (error) {
+        console.log(error);
+    }
+})
+app.get("/reviews/:id/edit", async(req, res) => {
+    try {
+        const review = await Review.findById(req.params.id)
+        res.render("reviews-edit", { review: review, title: "Edit Review" });
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+app.put("/reviews/:id", async(req, res) => {
+    try {
+        const review = await Review.findByIdAndUpdate(req.params.id, req.body);
+        res.redirect(`/reviews/${review._id}`);
     } catch (error) {
         console.log(error);
     }
