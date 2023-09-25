@@ -13,8 +13,8 @@ mongoose.connect("mongodb+srv://superskl5000:BE5IorpNY0Z6ApoV@100devs.c7wjvtf.mo
 
 const Review = new mongoose.model("Review", {
     title: String,
-    description: String,
     movieTitle: String,
+    description: String,
 });
 
 app.engine("handlebars", exphbs({defaultLayout: "main"}));
@@ -48,7 +48,16 @@ app.post("/reviews", async(req, res) => {
     try {
         const review = Review.create(req.body);
         console.log(review);
-        res.redirect("/");
+        res.redirect(`/reviews/${review._id}`);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+app.get("/reviews/:id", async(req, res) => {
+    try {
+        const review = await Review.findById(req.params.id)
+        res.render("reviews-show", { review: review });
     } catch (error) {
         console.log(error);
     }
