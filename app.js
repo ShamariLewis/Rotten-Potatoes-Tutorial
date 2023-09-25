@@ -30,7 +30,7 @@ app.set("view engine", "handlebars");
 
 app.get("/", async(req, res) => {
     try {
-        const reviews = Review.find()
+        const reviews = Review.find().lean()
         res.render("reviews-index", { reviews: reviews });
     } catch (error) {
         console.log(error);
@@ -58,7 +58,8 @@ app.post("/reviews", async(req, res) => {
 
 app.get("/reviews/:id", async(req, res) => {
     try {
-        const review = await Review.findById(req.params.id)
+        const review = await Review.findById({
+            _id: req.params.id}).lean()
         res.render("reviews-show", { review: review });
     } catch (error) {
         console.log(error);
@@ -66,7 +67,8 @@ app.get("/reviews/:id", async(req, res) => {
 })
 app.get("/reviews/:id/edit", async(req, res) => {
     try {
-        const review = await Review.findById(req.params.id)
+        const review = await Review.findById({
+            _id:req.params.id}).lean()
         res.render("reviews-edit", { review: review, title: "Edit Review" });
     } catch (error) {
         console.log(error);
@@ -80,6 +82,16 @@ app.put("/reviews/:id", async(req, res) => {
     } catch (error) {
         console.log(error);
     }
+});
+
+app.delete("/reviews/:id", async(req, res) => {
+    try {
+        console.log("Deleted")
+        const review = await Review.findByIdandRemove({_id: req.params.id}).lean()
+    } catch (error) {
+        
+    }
+
 })
 
 // app.get("/", (req, res) =>{
